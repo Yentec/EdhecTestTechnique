@@ -1,24 +1,40 @@
+import { createWriteStream } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 
-import { createObjectCsvWriter } from 'csv-writer';
+import { format } from '@fast-csv/format';
 
 import type { Forecast } from '@/models/forecast.js';
 
 const OUTPUT_DIRECTORY = path.join(process.cwd(), 'output');
 const OUTPUT_FILE = path.join(OUTPUT_DIRECTORY, 'forecast.csv');
 
-const csvWriter = createObjectCsvWriter({
-  path: OUTPUT_FILE,
-  header: [
-    { id: 'date', title: 'Date' },
-    { id: 'condition', title: 'Weather' },
-    { id: 'averageTemperature', title: 'Average temperature (°C)' },
-  ],
-});
-
 export async function writeForecastCsv(forecasts: Forecast[]): Promise<void> {
   await mkdir(OUTPUT_DIRECTORY, { recursive: true });
 
-  await csvWriter.writeRecords(forecasts);
+  return new Promise((resolve, reject) => {
+    if (forecasts.length === 0) {
+      return resolve();
+    }
+
+    const writeStream = createWriteStream(OUTPUT_FILE);
+    writeStream.write('\uFEFF');
+
+    const csvStream = format({
+      headers: ['Date', 'Weather', 'Average temperature (°C)'],
+      delimiter: ';',
+    });
+
+    csvStream.pipe(writeStream).on('finish', resolve).on('error', reject);
+
+    forecasts.forEach((forecast) => {
+      csvStream.write([
+        forecast.date,
+        forecast.condition,
+        forecast.averageTemperature,
+      ]);
+    });
+
+    csvStream.end();
+  });
 }
