@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+const apiBaseUrl = process.env['BASE_URL'];
 const apiKey = process.env['WEATHER_API_KEY'];
 
 if (!apiKey) {
@@ -9,5 +10,7 @@ if (!apiKey) {
 }
 
 export const config = {
+  weatherApiBaseUrl: apiBaseUrl,
   weatherApiKey: apiKey,
+  forecastDays: 4,
 };
