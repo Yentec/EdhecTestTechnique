@@ -103,22 +103,29 @@ describe('getForecast', () => {
       },
     ]);
   });
-
-  it('should throw the Weather API message for a 400 error', async () => {
-    getMock.mockRejectedValue({
-      isAxiosError: true,
-      response: {
-        status: 400,
-        data: {
-          error: {
-            message: 'No matching location found.',
+  it.each([
+    [400, 'No matching location found.'],
+    [401, 'API key is invalid.'],
+    [403, 'API key has insufficient permissions.'],
+    [404, 'No matching API route found.'],
+  ])(
+    'should throw the Weather API message for a %i response',
+    async (status, message) => {
+      getMock.mockRejectedValue({
+        isAxiosError: true,
+        response: {
+          status,
+          data: {
+            error: {
+              message,
+            },
           },
         },
-      },
-    });
+      });
 
-    await expect(getForecast('Unknown City')).rejects.toThrow(
-      'Weather API error: No matching location found.',
-    );
-  });
+      await expect(getForecast('Paris')).rejects.toThrow(
+        `Weather API error: ${message}`,
+      );
+    },
+  );
 });

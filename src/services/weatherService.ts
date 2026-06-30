@@ -24,19 +24,7 @@ export async function getForecast(city: string): Promise<Forecast[]> {
 
     return mapForecast(response.data.forecast.forecastday);
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      if (error.response?.status === 400) {
-        const message = error.response?.data?.error?.message ?? error.message;
-
-        throw new Error(`Weather API error: ${message}`);
-      }
-
-      throw new Error(`Weather API request failed: ${error.message}`);
-    }
-
-    throw new Error(
-      'An unexpected error occurred while fetching the weather forecast.',
-    );
+    handleWeatherApiError(error);
   }
 }
 
@@ -46,4 +34,16 @@ export function mapForecast(forecastDays: WeatherApiForecastDay[]): Forecast[] {
     condition: forecastDay.day.condition.text,
     averageTemperature: forecastDay.day.avgtemp_c,
   }));
+}
+
+function handleWeatherApiError(error: unknown): never {
+  if (!axios.isAxiosError(error)) {
+    throw new Error(
+      'An unexpected error occurred while fetching the weather forecast.',
+    );
+  }
+
+  const apiMessage = error.response?.data?.error?.message ?? error.message;
+
+  throw new Error(`Weather API error: ${apiMessage}`);
 }
