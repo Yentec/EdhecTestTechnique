@@ -8,6 +8,10 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    env:
+      BASE_URL: ${{ secrets.BASE_URL }}
+      WEATHER_API_KEY: ${{ secrets.WEATHER_API_KEY }}
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
