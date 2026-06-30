@@ -9,15 +9,18 @@ import type { Forecast } from '@/models/forecast.js';
 const OUTPUT_DIRECTORY = path.join(process.cwd(), 'output');
 const OUTPUT_FILE = path.join(OUTPUT_DIRECTORY, 'forecast.csv');
 
-export async function writeForecastCsv(forecasts: Forecast[]): Promise<void> {
-  await mkdir(OUTPUT_DIRECTORY, { recursive: true });
+export async function writeForecastCsv(
+  forecasts: Forecast[],
+  outputFile = OUTPUT_FILE,
+): Promise<void> {
+  await mkdir(path.dirname(outputFile), { recursive: true });
 
   return new Promise((resolve, reject) => {
     if (forecasts.length === 0) {
       return resolve();
     }
 
-    const writeStream = createWriteStream(OUTPUT_FILE);
+    const writeStream = createWriteStream(outputFile);
     writeStream.write('\uFEFF');
 
     const csvStream = format({
