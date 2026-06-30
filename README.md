@@ -42,7 +42,7 @@ src/
 
 ```bash
 git clone https://github.com/Yentec/EdhecTestTechnique.git
-cd weather-forecast
+cd EdhecTestTechnique
 npm install
 ```
 
@@ -73,6 +73,13 @@ Or with multiple words:
 
 ```bash
 npm run dev "New York"
+```
+
+# Tests
+
+```bash
+npm run test
+npm run test:watch
 ```
 
 ## Build & Run (production mode)
