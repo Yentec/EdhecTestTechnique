@@ -2,7 +2,10 @@ import axios from 'axios';
 
 import { config } from '@/config/config.js';
 import type { Forecast } from '@/models/forecast.js';
-import type { WeatherApiResponse } from '@/models/weatherApi.js';
+import type {
+  WeatherApiForecastDay,
+  WeatherApiResponse,
+} from '@/models/weatherApi.js';
 
 const client = axios.create({
   baseURL: config.weatherApiBaseUrl,
@@ -19,11 +22,7 @@ export async function getForecast(city: string): Promise<Forecast[]> {
       },
     });
 
-    return response.data.forecast.forecastday.map((forecastDay) => ({
-      date: forecastDay.date,
-      condition: forecastDay.day.condition.text,
-      averageTemperature: forecastDay.day.avgtemp_c,
-    }));
+    return mapForecast(response.data.forecast.forecastday);
   } catch (error) {
     if (axios.isAxiosError(error)) {
       if (error.response?.status === 400) {
@@ -39,4 +38,12 @@ export async function getForecast(city: string): Promise<Forecast[]> {
       'An unexpected error occurred while fetching the weather forecast.',
     );
   }
+}
+
+export function mapForecast(forecastDays: WeatherApiForecastDay[]): Forecast[] {
+  return forecastDays.map((forecastDay) => ({
+    date: forecastDay.date,
+    condition: forecastDay.day.condition.text,
+    averageTemperature: forecastDay.day.avgtemp_c,
+  }));
 }
