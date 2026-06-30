@@ -2,15 +2,18 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const apiBaseUrl = process.env['BASE_URL'];
-const apiKey = process.env['WEATHER_API_KEY'];
+function getEnv(name: string): string {
+  const value = process.env[name];
 
-if (!apiKey) {
-  throw new Error('Missing WEATHER_API_KEY environment variable.');
+  if (!value) {
+    throw new Error(`Missing ${name} environment variable.`);
+  }
+
+  return value;
 }
 
 export const config = {
-  weatherApiBaseUrl: apiBaseUrl,
-  weatherApiKey: apiKey,
+  weatherApiBaseUrl: getEnv('BASE_URL'),
+  weatherApiKey: getEnv('WEATHER_API_KEY'),
   forecastDays: 4,
 };
